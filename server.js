@@ -1,0 +1,175 @@
+const express = require('express');
+const bodyParser = require('body-parser');
+const session = require('express-session');
+const bcrypt = require('bcrypt');
+const path = require('path');
+const { pool, initDB } = require('./db');
+
+const app = express();
+const PORT = 3000;
+
+// 미들웨어 설정
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(session({
+  secret: 'your-secret-key',
+  resave: false,
+  saveUninitialized: false,
+  cookie: { maxAge: 3600000 } // 1시간
+}));
+
+// 데이터베이스 초기화
+initDB();
+
+// 아이디 중복 체크 API
+app.post('/api/check-username', async (req, res) => {
+  const { username } = req.body;
+  
+  try {
+    const result = await pool.query(
+      'SELECT username FROM users WHERE username = $1',
+      [username]
+    );
+    
+    if (result.rows.length > 0) {
+      res.json({ available: false, message: '이미 사용 중인 아이디입니다.' });
+    } else {
+      res.json({ available: true, message: '사용 가능한 아이디입니다.' });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// 회원가입 API (개선: UNIQUE 제약조건 활용 + 에러 처리)
+app.post('/api/register', async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    // 입력 검증
+    if (!username || !password) {
+      return res.status(400).json({
+        success: false,
+        message: '아이디와 비밀번호를 입력해주세요.'
+      });
+    }
+    
+    if (username.length < 3 || username.length > 50) {
+      return res.status(400).json({
+        success: false,
+        message: '아이디는 3자 이상 50자 이하로 입력해주세요.'
+      });
+    }
+    
+    if (password.length < 4) {
+      return res.status(400).json({
+        success: false,
+        message: '비밀번호는 4자 이상 입력해주세요.'
+      });
+    }
+    
+    // 비밀번호 해시화
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // 사용자 등록 (UNIQUE 제약조건이 중복 방지)
+    await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
+      [username, hashedPassword]
+    );
+    
+    res.json({ success: true, message: '회원가입이 완료되었습니다.' });
+  } catch (err) {
+    console.error('Register error:', err);
+    
+    // PostgreSQL UNIQUE 제약조건 위반 에러 (에러 코드: 23505)
+    if (err.code === '23505') {
+      return res.status(400).json({
+        success: false,
+        message: '이미 존재하는 아이디입니다. 다른 아이디를 사용해주세요.'
+      });
+    }
+    
+    // 기타 데이터베이스 에러
+    res.status(500).json({
+      success: false,
+      message: '서버 오류가 발생했습니다. 잠시 후 다시 시도해주세요.'
+    });
+  }
+});
+
+// 로그인 API
+app.post('/api/login', async (req, res) => {
+  const { username, password } = req.body;
+  
+  try {
+    const result = await pool.query(
+      'SELECT * FROM users WHERE username = $1',
+      [username]
+    );
+    
+    if (result.rows.length === 0) {
+      return res.status(401).json({ success: false, message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+    }
+    
+    const user = result.rows[0];
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    
+    if (!passwordMatch) {
+      return res.status(401).json({ success: false, message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+    }
+    
+    // 세션에 사용자 정보 저장
+    req.session.user = {
+      id: user.id,
+      username: user.username
+    };
+    
+    res.json({ success: true, message: '로그인 성공!' });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// 로그아웃 API
+app.post('/api/logout', (req, res) => {
+  req.session.destroy();
+  res.json({ success: true, message: '로그아웃되었습니다.' });
+});
+
+// 현재 사용자 정보 API
+app.get('/api/current-user', (req, res) => {
+  if (req.session.user) {
+    res.json({ loggedIn: true, username: req.session.user.username });
+  } else {
+    res.json({ loggedIn: false });
+  }
+});
+
+// 회원 목록 조회 API
+app.get('/api/users', async (req, res) => {
+  // 로그인 체크
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  }
+  
+  try {
+    const result = await pool.query(
+      'SELECT id, username, created_at FROM users ORDER BY created_at DESC'
+    );
+    
+    res.json({ success: true, users: result.rows });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ success: false, message: '서버 오류가 발생했습니다.' });
+  }
+});
+
+// 서버 시작
+app.listen(PORT, () => {
+  console.log(`Server is running on http://localhost:${PORT}`);
+});
+
+// Made with Bob
