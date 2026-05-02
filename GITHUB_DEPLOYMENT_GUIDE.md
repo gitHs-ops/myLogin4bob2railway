@@ -1,105 +1,16 @@
-# GitHub 배포 가이드
+# GitHub 배포 가이드 (myLogin03)
 
 GitHub에 코드를 업로드하고 클라우드 플랫폼에 배포하는 완벽한 가이드입니다.
 
+**리포지토리 이름: myLogin03**
+
 ## 📋 목차
-1. [리포지토리 이름 짓기](#리포지토리-이름-짓기)
-2. [GitHub 업로드 단계](#github-업로드-단계)
-3. [배포 전 준비](#배포-전-준비)
-4. [Render 배포](#render-배포)
-5. [문제 해결](#문제-해결)
-
----
-
-## 리포지토리 이름 짓기
-
-### 좋은 리포지토리 이름의 원칙
-
-1. **소문자 사용** (권장)
-2. **하이픈(-)으로 단어 구분**
-3. **명확하고 설명적인 이름**
-4. **짧고 기억하기 쉬운 이름**
-
-### 추천 이름 예시
-
-#### 프로젝트 성격별
-
-**일반적인 로그인 시스템:**
-```
-login-system
-user-authentication
-auth-system
-simple-login
-node-login-app
-```
-
-**기술 스택 포함:**
-```
-nodejs-login-system
-express-postgres-auth
-node-express-login
-postgres-auth-app
-```
-
-**기능 중심:**
-```
-user-management-system
-secure-login-app
-session-based-auth
-user-registration-system
-```
-
-**프로젝트 이름 포함:**
-```
-mylogin-app
-mylogin-system
-mylogin-v2
-login-project-2026
-```
-
-### 이 프로젝트 추천 이름
-
-#### 🥇 최고 추천 (5개)
-
-1. **`nodejs-login-system`**
-   - 명확한 기술 스택 표시
-   - 검색하기 쉬움
-   - 전문적인 느낌
-
-2. **`express-postgres-auth`**
-   - 사용 기술 명시
-   - 간결하고 명확
-   - 포트폴리오용으로 좋음
-
-3. **`simple-login-app`**
-   - 프로젝트 성격 명확
-   - 초보자 친화적
-   - 기억하기 쉬움
-
-4. **`user-auth-system`**
-   - 간결함
-   - 범용적
-   - 확장 가능한 이름
-
-5. **`mylogin-webapp`**
-   - 개인 프로젝트 느낌
-   - 친근함
-   - 독특함
-
-#### 피해야 할 이름
-
-❌ **너무 일반적:**
-- `project1`, `test`, `app`
-
-❌ **너무 길거나 복잡:**
-- `my-super-awesome-login-system-with-postgresql-and-nodejs`
-
-❌ **특수문자 사용:**
-- `login_system` (언더스코어보다 하이픈 권장)
-- `Login-System` (대문자 피하기)
-
-❌ **의미 불명확:**
-- `myPrjt01`, `system123`
+1. [GitHub 업로드 단계](#github-업로드-단계)
+2. [배포 전 준비](#배포-전-준비)
+3. [Render 배포](#render-배포)
+4. [소스 수정 후 재배포](#소스-수정-후-재배포)
+5. [Personal Access Token 생성](#personal-access-token-생성)
+6. [문제 해결](#문제-해결)
 
 ---
 
@@ -225,14 +136,17 @@ git commit -m "feat: Initial implementation of login system
 2. **우측 상단 '+' 클릭 → New repository**
 3. **리포지토리 설정:**
    ```
-   Repository name: nodejs-login-system
+   Repository name: myLogin03
    Description: Simple login system built with Node.js, Express, and PostgreSQL
    Public (공개) 또는 Private (비공개) 선택
-   ✅ Add a README file (체크 해제 - 이미 있음)
-   ✅ Add .gitignore (체크 해제 - 이미 있음)
+   
+   ☐ Add a README file (체크 해제 - 이미 있음)
+   ☐ Add .gitignore (체크 해제 - 이미 있음)
    Choose a license: MIT License (선택사항)
    ```
 4. **Create repository 클릭**
+
+**중요:** README와 .gitignore는 이미 로컬에 있으므로 체크 해제!
 
 ### Step 5: 원격 저장소 연결
 
@@ -240,7 +154,7 @@ git commit -m "feat: Initial implementation of login system
 
 ```powershell
 # 원격 저장소 추가
-git remote add origin https://github.com/your-username/nodejs-login-system.git
+git remote add origin https://github.com/your-username/myLogin03.git
 
 # 기본 브랜치 이름 확인/변경
 git branch -M main
@@ -249,19 +163,6 @@ git branch -M main
 git push -u origin main
 ```
 
-**인증 방법:**
-
-1. **Personal Access Token (권장)**
-   - GitHub → Settings → Developer settings → Personal access tokens
-   - Generate new token (classic)
-   - repo 권한 선택
-   - 토큰 복사 (비밀번호 대신 사용)
-
-2. **GitHub Desktop 사용 (쉬운 방법)**
-   - https://desktop.github.com 다운로드
-   - GitHub 계정 로그인
-   - GUI로 간편하게 관리
-
 ### Step 6: 업로드 확인
 
 ```powershell
@@ -269,7 +170,7 @@ git push -u origin main
 git remote -v
 
 # 브라우저에서 확인
-# https://github.com/your-username/nodejs-login-system
+# https://github.com/your-username/myLogin03
 ```
 
 ---
@@ -281,7 +182,7 @@ git remote -v
 **프로젝트 소개 추가:**
 
 ```markdown
-# Node.js Login System
+# myLogin03
 
 Simple and secure login system built with Node.js, Express, and PostgreSQL.
 
@@ -313,8 +214,8 @@ Simple and secure login system built with Node.js, Express, and PostgreSQL.
 
 1. Clone the repository
 ```bash
-git clone https://github.com/your-username/nodejs-login-system.git
-cd nodejs-login-system
+git clone https://github.com/your-username/myLogin03.git
+cd myLogin03
 ```
 
 2. Install dependencies
@@ -373,7 +274,7 @@ Your Name
 
 ```json
 {
-  "name": "nodejs-login-system",
+  "name": "mylogin03",
   "version": "1.1.0",
   "description": "Simple login system with Node.js and PostgreSQL",
   "main": "server.js",
@@ -393,7 +294,7 @@ Your Name
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/your-username/nodejs-login-system.git"
+    "url": "https://github.com/your-username/myLogin03.git"
   },
   "engines": {
     "node": ">=18.0.0",
@@ -494,10 +395,10 @@ SESSION_SECRET=your_random_secret_key_here
 
 1. Dashboard → New → Web Service
 2. Connect Repository 선택
-3. 저장소 선택: `nodejs-login-system`
+3. 저장소 선택: `myLogin03`
 4. 설정:
    ```
-   Name: nodejs-login-system
+   Name: mylogin03
    Region: Singapore
    Branch: main
    Runtime: Node
@@ -533,7 +434,414 @@ SESSION_SECRET=your_random_secret_key_here_min_32_chars
 1. Save Changes 클릭
 2. 자동 빌드 시작
 3. 5-10분 후 완료
-4. 제공된 URL로 접속: `https://nodejs-login-system.onrender.com`
+4. 제공된 URL로 접속: `https://mylogin03.onrender.com`
+
+---
+
+## 소스 수정 후 재배포
+
+### 🔄 자동 배포 (Render 기본 설정)
+
+Render는 GitHub와 연동되어 있어서 **자동 배포**가 됩니다.
+
+**작업 흐름:**
+
+```
+1. 로컬에서 코드 수정
+   ↓
+2. Git commit & push
+   ↓
+3. GitHub에 자동 업로드
+   ↓
+4. Render가 자동 감지
+   ↓
+5. 자동으로 재배포 시작
+   ↓
+6. 5-10분 후 배포 완료
+```
+
+### 단계별 상세 가이드
+
+#### 1. 로컬에서 코드 수정
+
+```javascript
+// 예: server.js 수정
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'New feature added!' });
+});
+```
+
+#### 2. Git으로 변경사항 커밋
+
+```powershell
+# 변경된 파일 확인
+git status
+
+# 변경사항 스테이징
+git add .
+
+# 또는 특정 파일만
+git add server.js
+
+# 커밋 (의미있는 메시지 작성)
+git commit -m "feat: Add test API endpoint"
+
+# GitHub에 푸시
+git push
+```
+
+#### 3. Render 자동 배포 확인
+
+**Render Dashboard에서:**
+
+1. **자동으로 배포 시작**
+   - "Deploy triggered by push to main"
+   - 실시간 로그 확인 가능
+
+2. **배포 진행 상황**
+   ```
+   Building...
+   Installing dependencies...
+   Starting server...
+   Deploy live
+   ```
+
+3. **완료 알림**
+   - 이메일 알림 (설정 시)
+   - Dashboard에 "Live" 표시
+
+#### 4. 배포 확인
+
+```
+https://mylogin03.onrender.com
+```
+
+브라우저에서 접속하여 변경사항 확인
+
+### 📝 커밋 메시지 예시
+
+**좋은 커밋 메시지:**
+
+```powershell
+# 새 기능 추가
+git commit -m "feat: Add password reset functionality"
+
+# 버그 수정
+git commit -m "fix: Resolve session timeout issue"
+
+# UI 개선
+git commit -m "style: Update login page design"
+
+# 문서 수정
+git commit -m "docs: Update README with new features"
+
+# 성능 개선
+git commit -m "perf: Optimize database queries"
+
+# 리팩토링
+git commit -m "refactor: Simplify authentication logic"
+```
+
+### 🚀 배포 전략
+
+#### 전략 1: 직접 main 브랜치에 푸시 (간단)
+
+```powershell
+# 수정
+git add .
+git commit -m "feat: Add new feature"
+git push
+
+# Render 자동 배포
+```
+
+**장점:** 빠르고 간단  
+**단점:** 테스트 없이 바로 프로덕션 반영
+
+#### 전략 2: 브랜치 사용 (권장)
+
+```powershell
+# 새 브랜치 생성
+git checkout -b feature/new-feature
+
+# 수정 및 커밋
+git add .
+git commit -m "feat: Add new feature"
+git push origin feature/new-feature
+
+# GitHub에서 Pull Request 생성
+# 코드 리뷰 후 main에 병합
+
+# main 브랜치로 전환
+git checkout main
+git pull
+
+# Render 자동 배포
+```
+
+**장점:** 안전하고 체계적  
+**단점:** 단계가 많음
+
+### 🔍 배포 모니터링
+
+#### Render Dashboard에서 확인
+
+**Deploy 탭:**
+- 배포 히스토리
+- 각 배포의 상태
+- 로그 확인
+- 롤백 가능
+
+**Logs 탭:**
+- 실시간 서버 로그
+- 에러 확인
+- 디버깅
+
+**Metrics 탭:**
+- CPU 사용량
+- 메모리 사용량
+- 응답 시간
+
+### ⚠️ 배포 실패 시
+
+#### 일반적인 원인
+
+1. **빌드 에러**
+   ```
+   npm install 실패
+   → package.json 확인
+   ```
+
+2. **시작 에러**
+   ```
+   서버 시작 실패
+   → 환경 변수 확인
+   → 포트 설정 확인
+   ```
+
+3. **데이터베이스 연결 실패**
+   ```
+   DB 연결 에러
+   → 환경 변수 확인
+   → SSL 설정 확인
+   ```
+
+#### 해결 방법
+
+**1. 로그 확인:**
+```
+Render Dashboard → Logs
+에러 메시지 확인
+```
+
+**2. 이전 버전으로 롤백:**
+```
+Render Dashboard → Deploys
+→ 이전 성공한 배포 선택
+→ Redeploy
+```
+
+**3. 로컬에서 테스트:**
+```powershell
+# 프로덕션 모드로 로컬 테스트
+set NODE_ENV=production
+npm start
+```
+
+### 🎯 실전 예시
+
+**시나리오: 로그인 페이지 디자인 변경**
+
+```powershell
+# 1. 파일 수정
+# public/styles.css 수정
+
+# 2. 로컬 테스트
+npm start
+# http://localhost:3000 확인
+
+# 3. Git 커밋
+git add public/styles.css
+git commit -m "style: Update login page button color"
+
+# 4. GitHub 푸시
+git push
+
+# 5. Render 확인
+# Dashboard에서 "Deploying..." 확인
+# 5분 후 "Live" 확인
+
+# 6. 배포된 사이트 확인
+# https://mylogin03.onrender.com
+```
+
+### 💡 팁
+
+**빠른 배포를 위한 팁:**
+
+1. **작은 단위로 자주 커밋**
+   ```powershell
+   # 나쁜 예
+   git commit -m "Various updates"
+   
+   # 좋은 예
+   git commit -m "fix: Resolve login button alignment"
+   git commit -m "feat: Add password strength indicator"
+   ```
+
+2. **배포 전 로컬 테스트**
+   ```powershell
+   npm start
+   # 모든 기능 테스트 후 push
+   ```
+
+3. **환경 변수 변경 시**
+   ```
+   Render Dashboard → Environment
+   → 변경 후 Manual Deploy 클릭
+   ```
+
+4. **긴급 롤백**
+   ```
+   Render Dashboard → Deploys
+   → 이전 버전 선택 → Redeploy
+   ```
+
+### 요약
+
+**소스 수정 후 배포는 매우 간단합니다:**
+
+```powershell
+git add .
+git commit -m "feat: Your changes"
+git push
+```
+
+**그러면 Render가 자동으로:**
+1. 변경사항 감지
+2. 빌드 시작
+3. 배포 완료
+4. 5-10분 후 반영
+
+**완전 자동화! 🎉**
+
+---
+
+## Personal Access Token 생성
+
+### 방법 1: 직접 URL 접속 (가장 빠름) ⭐
+
+```
+https://github.com/settings/tokens
+```
+
+브라우저에서 위 URL을 직접 입력하면 바로 토큰 페이지로 이동합니다!
+
+### 방법 2: GitHub Desktop 사용 (가장 쉬움) 🎯
+
+**Personal Access Token 없이 인증:**
+
+1. **GitHub Desktop 다운로드**
+   ```
+   https://desktop.github.com
+   ```
+
+2. **설치 및 실행**
+
+3. **File → Options → Accounts → Sign in**
+
+4. **브라우저에서 자동 인증**
+
+5. **GUI로 간편하게 Push/Pull**
+
+**장점:**
+- 토큰 생성 불필요
+- 클릭 몇 번으로 업로드
+- 초보자 친화적
+- 비주얼하게 변경사항 확인
+
+### 방법 3: Git Credential Manager (자동 인증)
+
+**Windows에서 Git 설치 시 자동 포함:**
+
+```powershell
+# Git push 시도
+git push -u origin main
+
+# 자동으로 브라우저 열림
+# GitHub 로그인 → 인증 완료
+# 이후 자동으로 저장됨
+```
+
+### Personal Access Token 생성 상세
+
+**만약 토큰이 필요하다면:**
+
+#### 1. 토큰 페이지 접속
+```
+https://github.com/settings/tokens
+```
+
+#### 2. Generate new token 클릭
+- "Generate new token (classic)" 선택
+
+#### 3. 토큰 설정
+```
+Note: Git Push Token for myLogin03
+Expiration: 90 days (또는 No expiration)
+
+Select scopes:
+☑ repo (전체 선택)
+```
+
+#### 4. Generate token 클릭
+
+#### 5. 토큰 복사
+```
+ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+⚠️ **중요:** 이 페이지를 벗어나면 다시 볼 수 없습니다!
+
+#### 6. 토큰 사용
+```powershell
+git push -u origin main
+
+Username: your-github-username
+Password: ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+```
+
+### 문제 해결
+
+#### "Developer settings가 안 보여요"
+
+**해결책:**
+1. 직접 URL 접속: `https://github.com/settings/tokens`
+2. 또는 GitHub Desktop 사용 (추천)
+
+#### "매번 토큰 입력이 귀찮아요"
+
+**해결책:**
+```powershell
+# Windows Credential Manager에 저장
+git config --global credential.helper wincred
+
+# 한 번만 입력하면 자동 저장됨
+```
+
+### 최종 추천: GitHub Desktop
+
+**5분 만에 완료:**
+
+1. https://desktop.github.com 다운로드
+2. 설치 및 GitHub 로그인
+3. File → Add Local Repository
+4. `C:\myPrjt01\myLogin02` 선택
+5. Publish repository 클릭
+6. Repository name: `myLogin03`
+7. Publish 클릭
+8. 완료! 🎉
+
+**토큰 생성 불필요, 클릭 몇 번으로 끝!**
 
 ---
 
@@ -547,11 +855,8 @@ fatal: Authentication failed
 ```
 
 **해결:**
-```powershell
-# Personal Access Token 사용
-# Username: your-github-username
-# Password: ghp_xxxxxxxxxxxxxxxxxxxx (토큰)
-```
+- GitHub Desktop 사용 (권장)
+- 또는 Personal Access Token 사용
 
 ### 문제 2: 파일이 너무 많이 추가됨
 
@@ -607,57 +912,6 @@ app.use(session({
 
 ---
 
-## 추가 Git 명령어
-
-### 일상적인 작업
-
-```powershell
-# 변경사항 확인
-git status
-
-# 변경사항 추가
-git add .
-
-# 커밋
-git commit -m "feat: Add new feature"
-
-# 푸시
-git push
-
-# 풀 (원격 변경사항 가져오기)
-git pull
-
-# 브랜치 생성
-git checkout -b feature/new-feature
-
-# 브랜치 전환
-git checkout main
-
-# 브랜치 병합
-git merge feature/new-feature
-```
-
-### 커밋 메시지 컨벤션
-
-```
-feat: 새로운 기능 추가
-fix: 버그 수정
-docs: 문서 수정
-style: 코드 포맷팅
-refactor: 코드 리팩토링
-test: 테스트 추가
-chore: 빌드 업무 수정
-```
-
-**예시:**
-```powershell
-git commit -m "feat: Add user profile page"
-git commit -m "fix: Resolve login session issue"
-git commit -m "docs: Update README with deployment guide"
-```
-
----
-
 ## 체크리스트
 
 ### GitHub 업로드 전
@@ -666,14 +920,12 @@ git commit -m "docs: Update README with deployment guide"
 - [ ] 민감한 정보 제거 (비밀번호, API 키)
 - [ ] README.md 작성
 - [ ] package.json 업데이트
-- [ ] 라이선스 선택
 
 ### 배포 전
 
 - [ ] 환경 변수 설정
 - [ ] 데이터베이스 연결 테스트
 - [ ] 로컬에서 프로덕션 모드 테스트
-- [ ] 에러 처리 확인
 
 ### 배포 후
 
@@ -685,33 +937,16 @@ git commit -m "docs: Update README with deployment guide"
 
 ---
 
-## 결론
+## 배포 소요 시간
 
-### 추천 리포지토리 이름 (최종)
-
-**이 프로젝트에 가장 적합한 이름:**
-
-1. **`nodejs-login-system`** ⭐⭐⭐⭐⭐
-2. **`express-postgres-auth`** ⭐⭐⭐⭐
-3. **`simple-login-app`** ⭐⭐⭐⭐
-
-### 배포 소요 시간
-
-- GitHub 업로드: 10분
-- Render 배포: 15분
-- 테스트: 5분
+- GitHub 업로드: **10분**
+- Render 배포: **15분**
+- 테스트: **5분**
 - **총 30분**
-
-### 다음 단계
-
-1. ✅ GitHub에 코드 업로드
-2. ✅ Render에 배포
-3. 📱 친구들과 공유
-4. 💼 포트폴리오에 추가
-5. 🚀 다음 프로젝트 시작!
 
 ---
 
 **작성일:** 2026-05-02  
 **작성자:** Bob (AI Assistant)  
-**버전:** 1.0
+**프로젝트:** myLogin03  
+**버전:** 2.0

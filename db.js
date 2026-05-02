@@ -1,12 +1,25 @@
+require('dotenv').config();
 const { Pool } = require('pg');
 
-// PostgreSQL 연결 설정
+// PostgreSQL 연결 설정 (환경 변수 사용)
 const pool = new Pool({
-  user: 'postgres',
-  host: 'localhost',
-  database: 'logindb',
-  password: 'sj1234', // 실제 PostgreSQL 비밀번호로 변경하세요
-  port: 5432,
+  user: process.env.DB_USER || 'postgres',
+  host: process.env.DB_HOST || 'localhost',
+  database: process.env.DB_NAME || 'logindb',
+  password: process.env.DB_PASSWORD || 'sj1234',
+  port: process.env.DB_PORT || 5432,
+  ssl: process.env.NODE_ENV === 'production' ? {
+    rejectUnauthorized: false
+  } : false
+});
+
+// 연결 확인
+pool.on('connect', () => {
+  console.log('Database connected successfully');
+});
+
+pool.on('error', (err) => {
+  console.error('Unexpected database error:', err);
 });
 
 // 데이터베이스 테이블 초기화
@@ -24,6 +37,7 @@ const initDB = async () => {
     console.log('Database initialized successfully');
   } catch (err) {
     console.error('Error initializing database:', err);
+    throw err;
   } finally {
     client.release();
   }
