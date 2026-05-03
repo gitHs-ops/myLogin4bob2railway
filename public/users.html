@@ -312,15 +312,15 @@
         async function loadUsers() {
             try {
                 // 로그인 상태 확인
-                const userResponse = await fetch('/api/current-user');
+                const userResponse = await fetch('/api/user');
                 const userData = await userResponse.json();
                 
-                if (!userData.loggedIn) {
+                if (!userData.success) {
                     window.location.href = 'login.html';
                     return;
                 }
 
-                currentUser = userData;
+                currentUser = userData.user;
 
                 // 회원 목록 불러오기
                 const response = await fetch('/api/users');
