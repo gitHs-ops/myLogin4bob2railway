@@ -60,50 +60,46 @@
 
         .action-buttons {
             display: flex;
-            gap: 5px;
+            gap: 8px;
+            justify-content: center;
         }
 
-        .action-btn {
-            padding: 6px 12px;
+        .icon-btn {
+            padding: 4px 8px;
             border: none;
             border-radius: 4px;
+            font-size: 16px;
             cursor: pointer;
-            font-size: 12px;
-            transition: all 0.3s;
+            transition: all 0.2s;
+            background: transparent;
         }
 
-        .edit-btn {
-            background: #4CAF50;
-            color: white;
+        .icon-btn:hover {
+            transform: scale(1.2);
         }
 
         .edit-btn:hover {
-            background: #45a049;
-        }
-
-        .delete-btn {
-            background: #f44336;
-            color: white;
+            filter: brightness(1.2);
         }
 
         .delete-btn:hover {
-            background: #da190b;
+            filter: brightness(1.2);
         }
 
         .add-btn {
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
-            padding: 12px 30px;
+            padding: 8px 16px;
             border: none;
-            border-radius: 25px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 16px;
-            margin-bottom: 20px;
-            transition: transform 0.3s;
+            font-size: 20px;
+            transition: transform 0.2s, box-shadow 0.2s;
         }
 
         .add-btn:hover {
             transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
         }
 
         .no-users {
@@ -250,8 +246,8 @@
         <div class="users-box">
             <h1>👥 회원 관리</h1>
             
-            <div style="text-align: center; margin-bottom: 20px;">
-                <button onclick="showAddModal()" class="add-btn">➕ 회원 추가</button>
+            <div id="adminControls" style="text-align: center; margin-bottom: 20px; display: none;">
+                <button onclick="showAddModal()" class="add-btn" title="회원 추가">➕</button>
             </div>
 
             <div class="user-count" id="userCount"></div>
@@ -267,7 +263,7 @@
                             <th>번호</th>
                             <th>아이디</th>
                             <th>가입일시</th>
-                            <th style="text-align: center;">관리</th>
+                            <th id="adminHeader" style="text-align: center; display: none;">관리</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
@@ -365,18 +361,24 @@
                 });
                 
                 const isCurrentUser = currentUser && user.username === currentUser.username;
+                const isAdmin = currentUser && currentUser.isAdmin;
                 const userBadge = isCurrentUser ? ' <span style="color: #667eea;">(나)</span>' : '';
+                
+                // 관리자인 경우 관리 아이콘 표시
+                const actionButtons = isAdmin ? `
+                    <td style="text-align: center;">
+                        <div class="action-buttons">
+                            <button onclick="showEditModal(${user.id}, '${user.username}')" class="icon-btn edit-btn" title="수정">✏️</button>
+                            <button onclick="deleteUser(${user.id}, '${user.username}')" class="icon-btn delete-btn" title="삭제">🗑️</button>
+                        </div>
+                    </td>
+                ` : '';
                 
                 row.innerHTML = `
                     <td>${index + 1}</td>
                     <td><strong>${user.username}</strong>${userBadge}</td>
                     <td>${formattedDate}</td>
-                    <td style="text-align: center;">
-                        <div class="action-buttons">
-                            <button onclick="showEditModal(${user.id}, '${user.username}')" class="action-btn edit-btn">수정</button>
-                            <button onclick="deleteUser(${user.id}, '${user.username}')" class="action-btn delete-btn" ${isCurrentUser ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>삭제</button>
-                        </div>
-                    </td>
+                    ${actionButtons}
                 `;
                 
                 tbody.appendChild(row);
@@ -384,6 +386,12 @@
             
             userCount.textContent = `총 ${users.length}명의 회원이 등록되어 있습니다.`;
             tableContainer.style.display = 'block';
+            
+            // 관리자인 경우 관리 기능 표시
+            if (currentUser && currentUser.isAdmin) {
+                document.getElementById('adminControls').style.display = 'block';
+                document.getElementById('adminHeader').style.display = 'table-cell';
+            }
         }
 
         // 추가 모달 표시

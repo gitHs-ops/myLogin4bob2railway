@@ -43,7 +43,7 @@ app.post('/api/check-username', async (req, res) => {
   }
 });
 
-// 회원가입 API (개선: UNIQUE 제약조건 활용 + 에러 처리)
+// 회원가입 API (개선: UNIQUE 제약조건 활용 + 에러 처리 + admin 차단)
 app.post('/api/register', async (req, res) => {
   const { username, password } = req.body;
   
@@ -53,6 +53,14 @@ app.post('/api/register', async (req, res) => {
       return res.status(400).json({
         success: false,
         message: '아이디와 비밀번호를 입력해주세요.'
+      });
+    }
+    
+    // admin 아이디 차단
+    if (username.toLowerCase() === 'admin') {
+      return res.status(400).json({
+        success: false,
+        message: '예약된 아이디입니다. 다른 아이디를 사용해주세요.'
       });
     }
     
@@ -99,11 +107,29 @@ app.post('/api/register', async (req, res) => {
   }
 });
 
-// 로그인 API
+// 로그인 API (admin 특별 처리 추가)
 app.post('/api/login', async (req, res) => {
   const { username, password } = req.body;
   
   try {
+    // admin 로그인 특별 처리
+    if (username === 'admin') {
+      const adminPassword = process.env.ADMIN_PASSWORD || 'admin1234'; // 기본값은 로컬 개발용
+      
+      if (password === adminPassword) {
+        // admin 세션 생성
+        req.session.user = {
+          id: 0,
+          username: 'admin',
+          isAdmin: true
+        };
+        return res.json({ success: true, message: '관리자 로그인 성공!' });
+      } else {
+        return res.status(401).json({ success: false, message: '아이디 또는 비밀번호가 올바르지 않습니다.' });
+      }
+    }
+    
+    // 일반 사용자 로그인
     const result = await pool.query(
       'SELECT * FROM users WHERE username = $1',
       [username]
@@ -123,7 +149,8 @@ app.post('/api/login', async (req, res) => {
     // 세션에 사용자 정보 저장
     req.session.user = {
       id: user.id,
-      username: user.username
+      username: user.username,
+      isAdmin: false
     };
     
     res.json({ success: true, message: '로그인 성공!' });
@@ -141,11 +168,11 @@ app.post('/api/logout', (req, res) => {
 
 // 현재 사용자 정보 API
 
-// 회원 추가 API (관리자용)
+// 회원 추가 API (관리자 전용)
 app.post('/api/users', async (req, res) => {
-  // 로그인 체크
-  if (!req.session.user) {
-    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  // 관리자 권한 체크
+  if (!req.session.user || !req.session.user.isAdmin) {
+    return res.status(403).json({ success: false, message: '관리자 권한이 필요합니다.' });
   }
   
   const { username, password } = req.body;
@@ -201,11 +228,11 @@ app.post('/api/users', async (req, res) => {
   }
 });
 
-// 회원 수정 API
+// 회원 수정 API (관리자 전용)
 app.put('/api/users/:id', async (req, res) => {
-  // 로그인 체크
-  if (!req.session.user) {
-    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  // 관리자 권한 체크
+  if (!req.session.user || !req.session.user.isAdmin) {
+    return res.status(403).json({ success: false, message: '관리자 권한이 필요합니다.' });
   }
   
   const { id } = req.params;
@@ -268,23 +295,16 @@ app.put('/api/users/:id', async (req, res) => {
   }
 });
 
-// 회원 삭제 API
+// 회원 삭제 API (관리자 전용)
 app.delete('/api/users/:id', async (req, res) => {
-  // 로그인 체크
-  if (!req.session.user) {
-    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  // 관리자 권한 체크
+  if (!req.session.user || !req.session.user.isAdmin) {
+    return res.status(403).json({ success: false, message: '관리자 권한이 필요합니다.' });
   }
   
   const { id } = req.params;
   
   try {
-    // 자기 자신은 삭제할 수 없음
-    if (parseInt(id) === req.session.user.id) {
-      return res.status(400).json({ 
-        success: false, 
-        message: '자기 자신은 삭제할 수 없습니다.' 
-      });
-    }
     
     const result = await pool.query(
       'DELETE FROM users WHERE id = $1',
