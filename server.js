@@ -166,6 +166,21 @@ app.post('/api/logout', (req, res) => {
   res.json({ success: true, message: '로그아웃되었습니다.' });
 });
 
+app.get('/api/user', (req, res) => {
+  if (req.session.user) {
+    res.json({ 
+      success: true, 
+      user: {
+        id: req.session.user.id,
+        username: req.session.user.username,
+        isAdmin: req.session.user.isAdmin || false
+      }
+    });
+  } else {
+    res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  }
+});
+
 // 현재 사용자 정보 API
 
 // 회원 추가 API (관리자 전용)
