@@ -140,6 +140,173 @@ app.post('/api/logout', (req, res) => {
 });
 
 // 현재 사용자 정보 API
+
+// 회원 추가 API (관리자용)
+app.post('/api/users', async (req, res) => {
+  // 로그인 체크
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  }
+  
+  const { username, password } = req.body;
+  
+  try {
+    // 입력 검증
+    if (!username || !password) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디와 비밀번호를 입력해주세요.' 
+      });
+    }
+    
+    if (username.length < 3 || username.length > 50) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디는 3자 이상 50자 이하로 입력해주세요.' 
+      });
+    }
+    
+    if (password.length < 4) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '비밀번호는 4자 이상 입력해주세요.' 
+      });
+    }
+    
+    // 비밀번호 해시화
+    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    // 사용자 등록
+    await pool.query(
+      'INSERT INTO users (username, password) VALUES ($1, $2)',
+      [username, hashedPassword]
+    );
+    
+    res.json({ success: true, message: '회원이 추가되었습니다.' });
+  } catch (err) {
+    console.error('Add user error:', err);
+    
+    // PostgreSQL UNIQUE 제약조건 위반 에러
+    if (err.code === '23505') {
+      return res.status(400).json({ 
+        success: false, 
+        message: '이미 존재하는 아이디입니다.' 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: '서버 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// 회원 수정 API
+app.put('/api/users/:id', async (req, res) => {
+  // 로그인 체크
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  }
+  
+  const { id } = req.params;
+  const { username, password } = req.body;
+  
+  try {
+    // 입력 검증
+    if (!username) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디를 입력해주세요.' 
+      });
+    }
+    
+    if (username.length < 3 || username.length > 50) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '아이디는 3자 이상 50자 이하로 입력해주세요.' 
+      });
+    }
+    
+    // 비밀번호가 제공된 경우에만 업데이트
+    if (password) {
+      if (password.length < 4) {
+        return res.status(400).json({ 
+          success: false, 
+          message: '비밀번호는 4자 이상 입력해주세요.' 
+        });
+      }
+      
+      const hashedPassword = await bcrypt.hash(password, 10);
+      await pool.query(
+        'UPDATE users SET username = $1, password = $2 WHERE id = $3',
+        [username, hashedPassword, id]
+      );
+    } else {
+      // 비밀번호 없이 아이디만 업데이트
+      await pool.query(
+        'UPDATE users SET username = $1 WHERE id = $2',
+        [username, id]
+      );
+    }
+    
+    res.json({ success: true, message: '회원 정보가 수정되었습니다.' });
+  } catch (err) {
+    console.error('Update user error:', err);
+    
+    // PostgreSQL UNIQUE 제약조건 위반 에러
+    if (err.code === '23505') {
+      return res.status(400).json({ 
+        success: false, 
+        message: '이미 존재하는 아이디입니다.' 
+      });
+    }
+    
+    res.status(500).json({ 
+      success: false, 
+      message: '서버 오류가 발생했습니다.' 
+    });
+  }
+});
+
+// 회원 삭제 API
+app.delete('/api/users/:id', async (req, res) => {
+  // 로그인 체크
+  if (!req.session.user) {
+    return res.status(401).json({ success: false, message: '로그인이 필요합니다.' });
+  }
+  
+  const { id } = req.params;
+  
+  try {
+    // 자기 자신은 삭제할 수 없음
+    if (parseInt(id) === req.session.user.id) {
+      return res.status(400).json({ 
+        success: false, 
+        message: '자기 자신은 삭제할 수 없습니다.' 
+      });
+    }
+    
+    const result = await pool.query(
+      'DELETE FROM users WHERE id = $1',
+      [id]
+    );
+    
+    if (result.rowCount === 0) {
+      return res.status(404).json({ 
+        success: false, 
+        message: '해당 회원을 찾을 수 없습니다.' 
+      });
+    }
+    
+    res.json({ success: true, message: '회원이 삭제되었습니다.' });
+  } catch (err) {
+    console.error('Delete user error:', err);
+    res.status(500).json({ 
+      success: false, 
+      message: '서버 오류가 발생했습니다.' 
+    });
+  }
+});
 app.get('/api/current-user', (req, res) => {
   if (req.session.user) {
     res.json({ loggedIn: true, username: req.session.user.username });

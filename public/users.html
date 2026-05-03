@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>회원 목록</title>
+    <title>회원 관리</title>
     <link rel="stylesheet" href="styles.css">
     <style>
         .users-container {
             width: 100%;
-            max-width: 900px;
+            max-width: 1100px;
             padding: 20px;
         }
 
@@ -58,6 +58,54 @@
             color: #555;
         }
 
+        .action-buttons {
+            display: flex;
+            gap: 5px;
+        }
+
+        .action-btn {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+
+        .edit-btn {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .edit-btn:hover {
+            background: #45a049;
+        }
+
+        .delete-btn {
+            background: #f44336;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #da190b;
+        }
+
+        .add-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 16px;
+            margin-bottom: 20px;
+            transition: transform 0.3s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+        }
+
         .no-users {
             text-align: center;
             padding: 40px;
@@ -91,6 +139,87 @@
             font-size: 14px;
         }
 
+        /* 모달 스타일 */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 10% auto;
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        .modal-body {
+            margin-bottom: 20px;
+        }
+
+        .modal-footer {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+        }
+
+        .modal-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+
+        .modal-btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .modal-btn-secondary {
+            background: #ccc;
+            color: #333;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            color: #555;
+            font-weight: 500;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+
+        .form-group small {
+            color: #999;
+            font-size: 12px;
+        }
+
         @media (max-width: 768px) {
             .users-container {
                 padding: 10px;
@@ -101,12 +230,17 @@
             }
 
             .users-table {
-                font-size: 14px;
+                font-size: 12px;
             }
 
             .users-table th,
             .users-table td {
-                padding: 10px 8px;
+                padding: 8px 5px;
+            }
+
+            .action-btn {
+                padding: 4px 8px;
+                font-size: 11px;
             }
         }
     </style>
@@ -114,7 +248,12 @@
 <body>
     <div class="users-container">
         <div class="users-box">
-            <h1>📋 회원 목록</h1>
+            <h1>👥 회원 관리</h1>
+            
+            <div style="text-align: center; margin-bottom: 20px;">
+                <button onclick="showAddModal()" class="add-btn">➕ 회원 추가</button>
+            </div>
+
             <div class="user-count" id="userCount"></div>
             
             <div id="loadingMessage" class="loading">
@@ -128,6 +267,7 @@
                             <th>번호</th>
                             <th>아이디</th>
                             <th>가입일시</th>
+                            <th style="text-align: center;">관리</th>
                         </tr>
                     </thead>
                     <tbody id="usersTableBody">
@@ -146,7 +286,32 @@
         </div>
     </div>
 
+    <!-- 추가/수정 모달 -->
+    <div id="userModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header" id="modalTitle">회원 추가</div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="modalUsername">아이디</label>
+                    <input type="text" id="modalUsername" placeholder="아이디 입력 (3-50자)">
+                </div>
+                <div class="form-group">
+                    <label for="modalPassword">비밀번호</label>
+                    <input type="password" id="modalPassword" placeholder="비밀번호 입력 (4자 이상)">
+                    <small id="passwordHint">수정 시 비밀번호를 비워두면 변경되지 않습니다.</small>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="closeModal()" class="modal-btn modal-btn-secondary">취소</button>
+                <button onclick="saveUser()" class="modal-btn modal-btn-primary" id="saveBtn">저장</button>
+            </div>
+        </div>
+    </div>
+
     <script>
+        let currentUserId = null;
+        let currentUser = null;
+
         // 페이지 로드 시 로그인 상태 확인 및 회원 목록 불러오기
         async function loadUsers() {
             try {
@@ -158,6 +323,8 @@
                     window.location.href = 'login.html';
                     return;
                 }
+
+                currentUser = userData;
 
                 // 회원 목록 불러오기
                 const response = await fetch('/api/users');
@@ -197,10 +364,19 @@
                     second: '2-digit'
                 });
                 
+                const isCurrentUser = currentUser && user.username === currentUser.username;
+                const userBadge = isCurrentUser ? ' <span style="color: #667eea;">(나)</span>' : '';
+                
                 row.innerHTML = `
                     <td>${index + 1}</td>
-                    <td><strong>${user.username}</strong></td>
+                    <td><strong>${user.username}</strong>${userBadge}</td>
                     <td>${formattedDate}</td>
+                    <td style="text-align: center;">
+                        <div class="action-buttons">
+                            <button onclick="showEditModal(${user.id}, '${user.username}')" class="action-btn edit-btn">수정</button>
+                            <button onclick="deleteUser(${user.id}, '${user.username}')" class="action-btn delete-btn" ${isCurrentUser ? 'disabled style="opacity: 0.5; cursor: not-allowed;"' : ''}>삭제</button>
+                        </div>
+                    </td>
                 `;
                 
                 tbody.appendChild(row);
@@ -208,6 +384,103 @@
             
             userCount.textContent = `총 ${users.length}명의 회원이 등록되어 있습니다.`;
             tableContainer.style.display = 'block';
+        }
+
+        // 추가 모달 표시
+        function showAddModal() {
+            currentUserId = null;
+            document.getElementById('modalTitle').textContent = '회원 추가';
+            document.getElementById('modalUsername').value = '';
+            document.getElementById('modalPassword').value = '';
+            document.getElementById('passwordHint').style.display = 'none';
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        // 수정 모달 표시
+        function showEditModal(id, username) {
+            currentUserId = id;
+            document.getElementById('modalTitle').textContent = '회원 수정';
+            document.getElementById('modalUsername').value = username;
+            document.getElementById('modalPassword').value = '';
+            document.getElementById('passwordHint').style.display = 'block';
+            document.getElementById('userModal').style.display = 'block';
+        }
+
+        // 모달 닫기
+        function closeModal() {
+            document.getElementById('userModal').style.display = 'none';
+        }
+
+        // 회원 저장 (추가/수정)
+        async function saveUser() {
+            const username = document.getElementById('modalUsername').value.trim();
+            const password = document.getElementById('modalPassword').value;
+
+            if (!username) {
+                alert('아이디를 입력해주세요.');
+                return;
+            }
+
+            if (!currentUserId && !password) {
+                alert('비밀번호를 입력해주세요.');
+                return;
+            }
+
+            try {
+                const url = currentUserId ? `/api/users/${currentUserId}` : '/api/users';
+                const method = currentUserId ? 'PUT' : 'POST';
+                
+                const body = { username };
+                if (password) {
+                    body.password = password;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(body)
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    closeModal();
+                    loadUsers();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error saving user:', error);
+                alert('회원 저장 중 오류가 발생했습니다.');
+            }
+        }
+
+        // 회원 삭제
+        async function deleteUser(id, username) {
+            if (!confirm(`정말로 "${username}" 회원을 삭제하시겠습니까?`)) {
+                return;
+            }
+
+            try {
+                const response = await fetch(`/api/users/${id}`, {
+                    method: 'DELETE'
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    alert(data.message);
+                    loadUsers();
+                } else {
+                    alert(data.message);
+                }
+            } catch (error) {
+                console.error('Error deleting user:', error);
+                alert('회원 삭제 중 오류가 발생했습니다.');
+            }
         }
 
         // 로그아웃
@@ -219,6 +492,14 @@
                 window.location.href = 'login.html';
             } catch (error) {
                 console.error('Error logging out:', error);
+            }
+        }
+
+        // 모달 외부 클릭 시 닫기
+        window.onclick = function(event) {
+            const modal = document.getElementById('userModal');
+            if (event.target == modal) {
+                closeModal();
             }
         }
 
