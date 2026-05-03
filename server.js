@@ -6,7 +6,7 @@ const path = require('path');
 const { pool, initDB } = require('./db');
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 // 미들웨어 설정
 app.use(bodyParser.json());
