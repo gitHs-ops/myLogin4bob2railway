@@ -13,10 +13,14 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(session({
-  secret: 'your-secret-key',
+  secret: process.env.SESSION_SECRET || 'your-secret-key-change-in-production',
   resave: false,
   saveUninitialized: false,
-  cookie: { maxAge: 3600000 } // 1시간
+  cookie: {
+    maxAge: 3600000, // 1시간
+    secure: process.env.NODE_ENV === 'production', // HTTPS에서만 쿠키 전송
+    httpOnly: true
+  }
 }));
 
 // 데이터베이스 초기화
