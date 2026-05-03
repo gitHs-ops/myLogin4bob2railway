@@ -8,6 +8,9 @@ const { pool, initDB } = require('./db');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
+// Railway 프록시 신뢰 설정
+app.set('trust proxy', 1);
+
 // 미들웨어 설정
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -19,7 +22,8 @@ app.use(session({
   cookie: {
     maxAge: 3600000, // 1시간
     secure: process.env.NODE_ENV === 'production', // HTTPS에서만 쿠키 전송
-    httpOnly: true
+    httpOnly: true,
+    sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax'
   }
 }));
 
